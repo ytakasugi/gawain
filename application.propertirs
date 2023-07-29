@@ -1,0 +1,4 @@
+db.driver=org.postgresql.Driver
+jdbc.url=jdbc:postgresql://postgres:5432/gawain
+db.user=app
+db.password=app
