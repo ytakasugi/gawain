@@ -1,4 +1,4 @@
-package jp.co.gawain.server.util;
+package co.jp.gawain.server.util;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,29 +25,15 @@ public class DatabaseUtility {
      * @return PreparedStatement
      * @throws SQLException
      */
-    private static PreparedStatement setSqlPram(Connection connection, String sql, List<Object> paramList) throws SQLException {
+    private static PreparedStatement setSqlParam(Connection connection, String sql, List<Object> paramList) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(sql);
-        if (null == paramList) {
-            return ps;
+        if (paramList != null) {
+            int index = 1;
+            for (Object param : paramList) {
+                ps.setObject(index, param);
+                index++;
+            }
         }
-        int index = 1;
-        for (Object param : paramList) {
-            ps.setObject(index, param);
-            index = index + 1;
-        }
-        return ps;
-    }
-
-    /**
-     * PreparedStatementを作成する
-     * @param connection コネクション
-     * @param sql
-     * @return PreparedStatement
-     * @throws SQLException
-     */
-    private static PreparedStatement setSql(Connection connection, String sql) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(sql);
-        
         return ps;
     }
 
@@ -61,29 +47,31 @@ public class DatabaseUtility {
     public static List<Map<String, Object>> executeQuery(Connection connection, String sql, List<Object> paramList) {
         ResultSet rs = null;
         PreparedStatement ps = null;
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> result = new ArrayList<>();
         try {
-            ps = setSqlPram(connection, sql, paramList);
+            ps = setSqlParam(connection, sql, paramList);
             rs = ps.executeQuery();
             ResultSetMetaData rsmd = rs.getMetaData();
             int count = rsmd.getColumnCount();
-            List<String> columnList = new ArrayList<String>();
+            List<String> columnList = new ArrayList<>();
             for (int i = 0; i < count; i++) {
                 columnList.add(rsmd.getColumnName(i + 1));
             }
             while (rs.next()) {
-                Map<String, Object> row = new HashMap<String, Object>();
+                Map<String, Object> row = new HashMap<>();
                 result.add(row);
 
                 for (int i = 0; i < columnList.size(); i++) {
-                    String key = (String)columnList.get(i);
+                    String key = columnList.get(i);
                     row.put(key, rs.getObject(key));
                 }
             }
             return result;
         } catch (SQLException e) {
-            throw new RuntimeException();
+            // エラーをログに出力するか、カスタム例外にラップするなど、適切な処理を行う
+            throw new RuntimeException("executeQueryでエラーが発生しました", e);
         } finally {
+            // リソースを適切にクローズする
             DatabaseManager.closeResultSet(rs);
             DatabaseManager.closeStatement(ps);
         }
@@ -95,35 +83,8 @@ public class DatabaseUtility {
      * @param sql 実行するSQL
      * @return 実行結果
      */
-    public static List<Map<String, Object>> executeQueryNoParam(Connection connection, String sql) {
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-        try {
-            ps = setSql(connection, sql);
-            rs = ps.executeQuery();
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int count = rsmd.getColumnCount();
-            List<String> columnList = new ArrayList<String>();
-            for (int i = 0; i < count; i++) {
-                columnList.add(rsmd.getColumnName(i + 1));
-            }
-            while (rs.next()) {
-                Map<String, Object> row = new HashMap<String, Object>();
-                result.add(row);
-
-                for (int i = 0; i < columnList.size(); i++) {
-                    String key = (String)columnList.get(i);
-                    row.put(key, rs.getObject(key));
-                }
-            }
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException();
-        } finally {
-            DatabaseManager.closeResultSet(rs);
-            DatabaseManager.closeStatement(ps);
-        }
+    public static List<Map<String, Object>> executeQueryWithoutParams(Connection connection, String sql) {
+        return executeQuery(connection, sql, null);
     }
 
     /**
@@ -136,11 +97,13 @@ public class DatabaseUtility {
     public static int executeUpdate(Connection connection, String sql, List<Object> paramList) {
         PreparedStatement ps = null;
         try {
-            ps = setSqlPram(connection, sql, paramList);
+            ps = setSqlParam(connection, sql, paramList);
             return ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(sql, e);
+            // エラーをログに出力するか、カスタム例外にラップするなど、適切な処理を行う
+            throw new RuntimeException("executeUpdateでエラーが発生しました", e);
         } finally {
+            // リソースを適切にクローズする
             DatabaseManager.closeStatement(ps);
         }
     }

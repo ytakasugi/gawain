@@ -1,4 +1,4 @@
-package jp.co.gawain.server.util;
+package co.jp.gawain.server.util;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,8 +11,8 @@ import com.zaxxer.hikari.HikariDataSource;
 public class DatabaseManager {
     // データベース関連のプロパティ
     private static final String JDBC_URL = Utility.getProp("jdbc.url");
-    private static final String DB_USER = Utility.getProp("jdbc.url");
-    private static final String DB_PASS = Utility.getProp("jdbc.url");
+    private static final String DB_USER = Utility.getProp("db.user");
+    private static final String DB_PASS = Utility.getProp("db.password");
 
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource dataSource;
@@ -20,11 +20,15 @@ public class DatabaseManager {
     private static ThreadLocal<Connection> threadLocalConnection = new ThreadLocal<>();
 
     static {
-        config.setJdbcUrl(JDBC_URL);
-        config.setUsername(DB_USER);
-        config.setPassword(DB_PASS);
+        try {
+            config.setJdbcUrl(JDBC_URL);
+            config.setUsername(DB_USER);
+            config.setPassword(DB_PASS);
 
-        dataSource = new HikariDataSource(config);
+            dataSource = new HikariDataSource(config);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
      /**
@@ -37,7 +41,7 @@ public class DatabaseManager {
      * コネクションを取得・作成する
      * @return Connection
      */
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         Connection connection = threadLocalConnection.get();
         if (connection == null || connection.isClosed()) {
             connection = dataSource.getConnection();

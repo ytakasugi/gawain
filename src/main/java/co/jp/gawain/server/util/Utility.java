@@ -1,4 +1,4 @@
-package jp.co.gawain.server.util;
+package co.jp.gawain.server.util;
 
 import java.util.Properties;
 import java.io.FileInputStream;
@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 public class Utility {
     private static final String COMMON_PROP_PATH = "./application.properties";
+    private static final String SQL_PROP_PATH = "./sql.properties";
 
     /**
      * コンストラクタ
@@ -22,6 +23,22 @@ public class Utility {
         Properties prop = new Properties();
         try {
             InputStream is = new FileInputStream(COMMON_PROP_PATH);
+            prop.load(is);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return prop.getProperty(key);
+    }
+
+    /**
+     * SQLプロパティを読み込み、keyと一致する値(SQL)を取得する
+     * @param key
+     * @return String
+     */
+    public static String getSql(String key) {
+        Properties prop = new Properties();
+        try {
+            InputStream is = new FileInputStream(SQL_PROP_PATH);
             prop.load(is);
         } catch(IOException e) {
             e.printStackTrace();
