@@ -75,9 +75,9 @@ public class DatabaseManager {
     }
 
     /**
-     * トランザクションを終了する
+     * コネクションをクローズする
      */
-    public static void end(Connection conn) {
+    public static void close(Connection conn) {
         if (conn != null) {
             try {
                 closeConnection(conn);

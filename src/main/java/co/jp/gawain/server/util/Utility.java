@@ -1,5 +1,7 @@
 package co.jp.gawain.server.util;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,5 +46,20 @@ public class Utility {
             e.printStackTrace();
         }
         return prop.getProperty(key);
+    }
+
+    /**
+     * ユーザー情報を標準出力する
+     * @param UserDto
+     */
+    public static void printUser(List<Map<String, Object>> user) {
+        for (int i = 0; i < user.size(); i++) {
+            System.out.printf(
+             "%s, %s, %s \n", 
+                user.get(i).get("user_id"),
+                user.get(i).get("user_name"),
+                user.get(i).get("e_mail")
+            );
+        }
     }
 }
