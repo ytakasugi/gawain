@@ -1,30 +1,16 @@
 package co.jp.gawain.server;
 
-import java.sql.Connection;
-
-import co.jp.gawain.server.dao.UserDao;
+import co.jp.gawain.server.api.UserApi;
 import co.jp.gawain.server.dto.UserDto;
-
-import co.jp.gawain.server.util.DatabaseManager;
 
 public class App {
     public static void main(String[] args) {
-        Connection connection = null;
         UserDto dto = new UserDto();
+        dto.setUserName("test0001");
+        dto.setEMail("test0001@example.com");
 
-        dto.setUserName("admin");
-        dto.setEMail("admin@example.com");
+        UserApi.newUser(dto);
 
-        try {
-            connection = DatabaseManager.getConnection();
-            UserDao dao = new UserDao(connection);
-            dao.insertNewUser(dto);
-            DatabaseManager.commit(connection);
-        } catch (Exception e) {
-            DatabaseManager.rollback(connection);
-        } finally {
-            DatabaseManager.close(connection);
-        }
-
+        UserApi.getAllUser();
     }
 }
