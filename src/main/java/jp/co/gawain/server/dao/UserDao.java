@@ -1,13 +1,13 @@
-package co.jp.gawain.server.dao;
+package jp.co.gawain.server.dao;
 
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.sql.Connection;
 
-import co.jp.gawain.server.dto.UserDto;
-import co.jp.gawain.server.util.DatabaseUtility;
-import co.jp.gawain.server.util.Utility;
+import jp.co.gawain.server.dto.UserDto;
+import jp.co.gawain.server.util.DatabaseUtility;
+import jp.co.gawain.server.util.Utility;
 
 public class UserDao {
     private Connection connection;

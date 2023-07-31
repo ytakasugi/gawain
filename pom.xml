@@ -4,7 +4,8 @@
   <groupId>jp.co.gawain.server</groupId>
   <artifactId>gawain</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <!--version>1.0-SNAPSHOT</version-->
+  <version>0.0.1</version>
   <name>gawain</name>
   <url>http://maven.apache.org</url>
   
@@ -36,11 +37,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.25</version>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.4.8</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>

@@ -1,9 +1,12 @@
-package co.jp.gawain.server.util;
+package jp.co.gawain.server.util;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -18,6 +21,8 @@ public class DatabaseManager {
     private static HikariDataSource dataSource;
 
     private static ThreadLocal<Connection> threadLocalConnection = new ThreadLocal<>();
+
+    private static Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 
     static {
         try {
@@ -44,6 +49,7 @@ public class DatabaseManager {
     public static Connection getConnection() throws SQLException {
         Connection connection = threadLocalConnection.get();
         if (connection == null || connection.isClosed()) {
+            logger.info("コネクションを取得します");
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             threadLocalConnection.set(connection);
@@ -57,7 +63,7 @@ public class DatabaseManager {
     public static void validate(Connection conn) {
         try {
             if (conn.getAutoCommit()) {
-                System.out.println("Auto Commit is True");
+                logger.info("自動コミットが有効です");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -80,9 +86,11 @@ public class DatabaseManager {
     public static void close(Connection conn) {
         if (conn != null) {
             try {
+                logger.info("コネクションをクローズします");
                 closeConnection(conn);
+                logger.info("コネクションをクローズしました");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("コネクションのクローズに失敗しました", e);
             } finally {
                 remove(true);
             }
@@ -95,9 +103,11 @@ public class DatabaseManager {
     public static void commit(Connection conn) {
         if (conn != null) {
             try {
+                logger.info("トランザクションをコミットします");
                 conn.commit();
+                logger.info("トランザクションをコミットしました");
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("トランザクションのコミットに失敗しました", e);
             }
         }
     }
@@ -108,9 +118,11 @@ public class DatabaseManager {
     public static void rollback(Connection conn) {
         if (conn != null) {
             try {
+                logger.info("トランザクションをロールバックします");
                 conn.rollback();
+                logger.info("トランザクションをロールバックしました");
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("トランザクションのロールバックに失敗しました", e);
             }
         }
     }
@@ -122,9 +134,11 @@ public class DatabaseManager {
     private static void closeConnection(Connection target) {
         if (target != null) {
             try {
+                logger.info("コネクションをクローズします");
                 target.close();
+                logger.info("コネクションをクローズしました");
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("コネクションのロールバックに失敗しました", e);
             }
         }
     }
@@ -160,9 +174,11 @@ public class DatabaseManager {
     /**
      * データソースをクローズする
      */
-    public void cloeseDatasSource() {
+    public static void cloeseDatasSource() {
         if (dataSource != null) {
+            logger.info("データソースをクローズします");
             dataSource.close();
+            logger.info("データソースをクローズしました");
         }
     }
 

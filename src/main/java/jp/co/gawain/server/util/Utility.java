@@ -1,4 +1,4 @@
-package co.jp.gawain.server.util;
+package jp.co.gawain.server.util;
 
 import java.util.List;
 import java.util.Map;

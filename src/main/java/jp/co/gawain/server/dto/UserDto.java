@@ -1,4 +1,4 @@
-package co.jp.gawain.server.dto;
+package jp.co.gawain.server.dto;
 
 import java.sql.Timestamp;
 
