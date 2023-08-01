@@ -1,9 +1,0 @@
-jp/co/gawain/server/App.class
-jp/co/gawain/server/driver/getAllUserMain.class
-jp/co/gawain/server/util/DatabaseManager.class
-jp/co/gawain/server/util/DatabaseUtility.class
-jp/co/gawain/server/dao/UserDao.class
-jp/co/gawain/server/dto/UserDto.class
-jp/co/gawain/server/constans/GawainMessageConstants.class
-jp/co/gawain/server/api/UserApi.class
-jp/co/gawain/server/util/Utility.class
