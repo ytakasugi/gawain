@@ -19,7 +19,7 @@ public class UserDao {
         this.connection = connection;
     }
     // ユーザー情報を登録するメソッド
-    public void insertNewUser(UserDto userDto) throws Exception {
+    public void create(UserDto userDto) throws Exception {
         String sql = Utility.getSql("insertNewUser");
         List<Object> paramList = new ArrayList<Object>();
 
@@ -34,7 +34,7 @@ public class UserDao {
     }
 
     // 全ユーザーを取得するメソッド
-    public List<Map<String, Object>> getAllUserInfo() throws Exception {
+    public List<Map<String, Object>> getAllUser() throws Exception {
         // 結果格納用配列の作成
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
         // SQL文作成

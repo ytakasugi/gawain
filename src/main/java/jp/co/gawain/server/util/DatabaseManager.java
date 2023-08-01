@@ -11,11 +11,14 @@ import org.slf4j.LoggerFactory;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import jp.co.gawain.server.constans.GawainMessageConstants;
+
 public class DatabaseManager {
     // データベース関連のプロパティ
     private static final String JDBC_URL = Utility.getProp("jdbc.url");
     private static final String DB_USER = Utility.getProp("db.user");
     private static final String DB_PASS = Utility.getProp("db.password");
+    private static final int CONNECTION_POOL_SIZE = Integer.parseInt(Utility.getProp("connection.pool.size"));
 
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource dataSource;
@@ -29,6 +32,7 @@ public class DatabaseManager {
             config.setJdbcUrl(JDBC_URL);
             config.setUsername(DB_USER);
             config.setPassword(DB_PASS);
+            config.setMaximumPoolSize(CONNECTION_POOL_SIZE);
 
             dataSource = new HikariDataSource(config);
         } catch (Exception e) {
@@ -49,7 +53,7 @@ public class DatabaseManager {
     public static Connection getConnection() throws SQLException {
         Connection connection = threadLocalConnection.get();
         if (connection == null || connection.isClosed()) {
-            logger.info("コネクションを取得します");
+            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_001);
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             threadLocalConnection.set(connection);
@@ -63,10 +67,10 @@ public class DatabaseManager {
     public static void validate(Connection conn) {
         try {
             if (conn.getAutoCommit()) {
-                logger.info("自動コミットが有効です");
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_002);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_001, e);
         }
     }
 
@@ -86,11 +90,11 @@ public class DatabaseManager {
     public static void close(Connection conn) {
         if (conn != null) {
             try {
-                logger.info("コネクションをクローズします");
-                closeConnection(conn);
-                logger.info("コネクションをクローズしました");
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_003);
+                conn.close();
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_004);
             } catch (Exception e) {
-                logger.error("コネクションのクローズに失敗しました", e);
+                logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_002, e);
             } finally {
                 remove(true);
             }
@@ -103,11 +107,11 @@ public class DatabaseManager {
     public static void commit(Connection conn) {
         if (conn != null) {
             try {
-                logger.info("トランザクションをコミットします");
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_005);
                 conn.commit();
-                logger.info("トランザクションをコミットしました");
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_006);
             } catch (SQLException e) {
-                logger.error("トランザクションのコミットに失敗しました", e);
+                logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_003, e);
             }
         }
     }
@@ -118,27 +122,11 @@ public class DatabaseManager {
     public static void rollback(Connection conn) {
         if (conn != null) {
             try {
-                logger.info("トランザクションをロールバックします");
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_007);
                 conn.rollback();
-                logger.info("トランザクションをロールバックしました");
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_008);
             } catch (SQLException e) {
-                logger.error("トランザクションのロールバックに失敗しました", e);
-            }
-        }
-    }
-
-    /**
-     * Connectionをクローズする
-     * @param target
-     */
-    private static void closeConnection(Connection target) {
-        if (target != null) {
-            try {
-                logger.info("コネクションをクローズします");
-                target.close();
-                logger.info("コネクションをクローズしました");
-            } catch (SQLException e) {
-                logger.error("コネクションのロールバックに失敗しました", e);
+                logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_004, e);
             }
         }
     }
@@ -176,9 +164,9 @@ public class DatabaseManager {
      */
     public static void cloeseDatasSource() {
         if (dataSource != null) {
-            logger.info("データソースをクローズします");
+            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_009);
             dataSource.close();
-            logger.info("データソースをクローズしました");
+            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_010);
         }
     }
 

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.gawain.server.constans.GawainMessageConstants;
 import jp.co.gawain.server.dao.UserDao;
 import jp.co.gawain.server.dto.UserDto;
 import jp.co.gawain.server.util.DatabaseManager;
@@ -23,31 +24,30 @@ public class UserApi {
         try {
             connection = DatabaseManager.getConnection();
             UserDao dao = new UserDao(connection);
-            logger.info("ユーザー情報を取得します");
-            resultList = dao.getAllUserInfo();
-            Utility.printUser(dao.getAllUserInfo());
-            logger.info("ユーザー情報を取得しました");
+            logger.info(GawainMessageConstants.APPLICATION_INFO_MESSAGE_001);
+            resultList = dao.getAllUser();
+            Utility.printUser(resultList);
+            logger.info(GawainMessageConstants.APPLICATION_INFO_MESSAGE_002);
         } catch (Exception e) {
-            // 何もしない
-            logger.error("エラーが発生しました", e);
+            logger.error(GawainMessageConstants.APPLICATION_ERROR_MESSAGE_001, e);
         } finally {
             DatabaseManager.close(connection);
         }
         return resultList;
     }
 
-    public static void newUser(UserDto dto) {
+    public static void create(UserDto dto) {
         Connection connection = null;
 
         try {
             connection = DatabaseManager.getConnection();
             UserDao dao = new UserDao(connection);
-            logger.info("ユーザー情報を作成します");
-            dao.insertNewUser(dto);
-            logger.info("ユーザー情報を作成しました");
+            logger.info(GawainMessageConstants.APPLICATION_INFO_MESSAGE_003);
+            dao.create(dto);
+            logger.info(GawainMessageConstants.APPLICATION_INFO_MESSAGE_004);
             DatabaseManager.commit(connection);
         } catch (Exception e) {
-            logger.error("エラーが発生しました。", e);
+            logger.error(GawainMessageConstants.APPLICATION_ERROR_MESSAGE_001, e);
             DatabaseManager.rollback(connection);
         } finally {
             DatabaseManager.close(connection);
