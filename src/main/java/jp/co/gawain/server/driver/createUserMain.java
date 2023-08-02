@@ -45,7 +45,7 @@ public class createUserMain {
             DatabaseManager.rollback();
         } finally {
             DatabaseManager.close();
-            DatabaseManager.cloeseDatasSource();
+            DatabaseManager.closeDatasSource();
         }
     }
 }

@@ -59,6 +59,7 @@ public class DatabaseUtility {
             for (int i = 0; i < count; i++) {
                 columnList.add(rsmd.getColumnName(i + 1));
             }
+
             while (rs.next()) {
                 Map<String, Object> row = new HashMap<>();
                 result.add(row);
@@ -76,7 +77,6 @@ public class DatabaseUtility {
             // リソースを適切にクローズする
             DatabaseManager.closeResultSet(rs);
             DatabaseManager.closeStatement(ps);
-            DatabaseManager.close();
         }
     }
 
@@ -98,7 +98,7 @@ public class DatabaseUtility {
      * @param params 設定するパラメーター
      * @return 実行結果
      */
-    public static int executeUpdate(String sql, List<Object> paramList) {
+    public static int executeUpdate(String sql, List<Object> paramList) throws SQLException {
         Connection connection = DatabaseManager.get();
         PreparedStatement ps = null;
         try {

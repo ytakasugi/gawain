@@ -103,7 +103,7 @@ public class DatabaseManager {
     /**
      * トランザクションを開始する
      */
-    public static void begin() {
+    public synchronized static void begin() {
         logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_004);
         Connection connection = threadLocalConnection.get();
         if (connection == null) {
@@ -121,7 +121,7 @@ public class DatabaseManager {
     /**
      * コミットを行う
      */
-    public static void commit() {
+    public synchronized static void commit() {
         Connection connection = threadLocalConnection.get();
         if (connection != null) {
             try {
@@ -137,7 +137,7 @@ public class DatabaseManager {
     /**
      * ロールバックを行う
      */
-    public static void rollback() {
+    public synchronized static void rollback() {
         Connection connection = threadLocalConnection.get();
         if (connection != null) {
             try {
@@ -199,7 +199,7 @@ public class DatabaseManager {
     /**
      * データソースをクローズする
      */
-    public static void cloeseDatasSource() {
+    public static void closeDatasSource() {
         if (dataSource != null) {
             logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_012);
             dataSource.close();
