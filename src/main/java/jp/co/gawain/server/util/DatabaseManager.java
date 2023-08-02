@@ -23,40 +23,46 @@ public class DatabaseManager {
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource dataSource;
 
+    private static DatabaseManager instance = new DatabaseManager();
     private static ThreadLocal<Connection> threadLocalConnection = new ThreadLocal<>();
 
     private static Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
-
-    static {
-        try {
-            config.setJdbcUrl(JDBC_URL);
-            config.setUsername(DB_USER);
-            config.setPassword(DB_PASS);
-            config.setMaximumPoolSize(CONNECTION_POOL_SIZE);
-
-            dataSource = new HikariDataSource(config);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
      /**
      * コンストラクタ
      */
     private DatabaseManager() {
+        try {
+            config.setJdbcUrl(JDBC_URL);
+            config.setUsername(DB_USER);
+            config.setPassword(DB_PASS);
+            config.setMaximumPoolSize(CONNECTION_POOL_SIZE);
+            dataSource = new HikariDataSource(config);
+        } catch (Exception e) {
+            logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_001, e);
+        }
+    }
+
+    /**
+     * インスタンスを返却する
+     * @return
+     */
+    public static DatabaseManager getInstance() {
+        return instance;
     }
 
     /**
      * コネクションを取得・作成する
      * @return Connection
      */
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         Connection connection = threadLocalConnection.get();
         if (connection == null || connection.isClosed()) {
             logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_001);
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             threadLocalConnection.set(connection);
+            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_002);
         }
         return connection;
     }
@@ -64,13 +70,14 @@ public class DatabaseManager {
     /**
      * 自動コミットがTrueだった場合、メッセージを出力する
      */
-    public static void validate(Connection conn) {
+    public static void validate() {
+        Connection connection = threadLocalConnection.get();
         try {
-            if (conn.getAutoCommit()) {
-                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_002);
+            if (connection.getAutoCommit()) {
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_003);
             }
         } catch (SQLException e) {
-            logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_001, e);
+            logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_002, e);
         }
     }
 
@@ -85,48 +92,78 @@ public class DatabaseManager {
     }
 
     /**
-     * コネクションをクローズする
+     * ThreadLocalからコネクションを取得する
+     * @return
      */
-    public static void close(Connection conn) {
-        if (conn != null) {
-            try {
-                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_003);
-                conn.close();
-                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_004);
-            } catch (Exception e) {
-                logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_002, e);
-            } finally {
-                remove(true);
-            }
-        }
+    public static Connection get() {
+        logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_001);
+        return threadLocalConnection.get();
     }
 
     /**
-     * コミット
+     * トランザクションを開始する
      */
-    public static void commit(Connection conn) {
-        if (conn != null) {
+    public static void begin() {
+        logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_004);
+        Connection connection = threadLocalConnection.get();
+        if (connection == null) {
             try {
-                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_005);
-                conn.commit();
-                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_006);
+                connection = dataSource.getConnection();
+                connection.setAutoCommit(false);
+                threadLocalConnection.set(connection);
             } catch (SQLException e) {
                 logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_003, e);
             }
         }
+        logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_005);
     }
 
     /**
-     * ロールバック
+     * コミットを行う
      */
-    public static void rollback(Connection conn) {
-        if (conn != null) {
+    public static void commit() {
+        Connection connection = threadLocalConnection.get();
+        if (connection != null) {
             try {
-                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_007);
-                conn.rollback();
                 logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_008);
+                connection.commit();
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_009);
+            } catch (SQLException e) {
+                logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_005, e);
+            }
+        }
+    }
+
+    /**
+     * ロールバックを行う
+     */
+    public static void rollback() {
+        Connection connection = threadLocalConnection.get();
+        if (connection != null) {
+            try {
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_010);
+                connection.rollback();
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_011);
+            } catch (SQLException e) {
+                logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_006, e);
+            }
+        }
+    }
+
+    /**
+     * データベース接続をクローズする
+     */
+    public static void close() {
+        Connection connection = threadLocalConnection.get();
+        if (connection != null) {
+            try {
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_006);
+                connection.close();
+                logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_007);
             } catch (SQLException e) {
                 logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_004, e);
+            } finally {
+                remove(true);
             }
         }
     }
@@ -164,10 +201,9 @@ public class DatabaseManager {
      */
     public static void cloeseDatasSource() {
         if (dataSource != null) {
-            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_009);
+            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_012);
             dataSource.close();
-            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_010);
+            logger.info(GawainMessageConstants.DATABASE_INFO_MESSAGE_013);
         }
     }
-
 }

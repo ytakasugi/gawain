@@ -43,8 +43,10 @@ public class DatabaseUtility {
      * @param sql 実行するSQL
      * @param paramList 設定するパラメーター
      * @return 実行結果
+     * @throws SQLException
      */
-    public static List<Map<String, Object>> executeQuery(Connection connection, String sql, List<Object> paramList) {
+    public static List<Map<String, Object>> executeQuery(String sql, List<Object> paramList) throws SQLException {
+        Connection connection = DatabaseManager.getInstance().getConnection();
         ResultSet rs = null;
         PreparedStatement ps = null;
         List<Map<String, Object>> result = new ArrayList<>();
@@ -74,6 +76,7 @@ public class DatabaseUtility {
             // リソースを適切にクローズする
             DatabaseManager.closeResultSet(rs);
             DatabaseManager.closeStatement(ps);
+            DatabaseManager.close();
         }
     }
 
@@ -82,9 +85,10 @@ public class DatabaseUtility {
      * @param connection コネクション
      * @param sql 実行するSQL
      * @return 実行結果
+     * @throws SQLException
      */
-    public static List<Map<String, Object>> executeQueryWithoutParams(Connection connection, String sql) {
-        return executeQuery(connection, sql, null);
+    public static List<Map<String, Object>> executeQueryWithoutParams(String sql) throws SQLException {
+        return executeQuery(sql, null);
     }
 
     /**
@@ -94,7 +98,8 @@ public class DatabaseUtility {
      * @param params 設定するパラメーター
      * @return 実行結果
      */
-    public static int executeUpdate(Connection connection, String sql, List<Object> paramList) {
+    public static int executeUpdate(String sql, List<Object> paramList) {
+        Connection connection = DatabaseManager.get();
         PreparedStatement ps = null;
         try {
             ps = setSqlParam(connection, sql, paramList);

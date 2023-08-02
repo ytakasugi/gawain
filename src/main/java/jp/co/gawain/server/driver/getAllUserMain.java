@@ -4,6 +4,6 @@ import jp.co.gawain.server.api.UserApi;
 
 public class getAllUserMain {
     public static void main(String[] args) {
-        UserApi.getAllUser();
+        UserApi.get();
     }
 }
