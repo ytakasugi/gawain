@@ -14,6 +14,7 @@ import jp.co.gawain.server.constans.GawainMessageConstants;
 import jp.co.gawain.server.dao.UserDao;
 import jp.co.gawain.server.dto.UserDto;
 import jp.co.gawain.server.util.DatabaseManager;
+import jp.co.gawain.server.util.Utility;
 
 /**
  * バグあり
@@ -22,7 +23,7 @@ import jp.co.gawain.server.util.DatabaseManager;
 public class createUserMultiMain {
     private static Logger logger = LoggerFactory.getLogger(createUserMultiMain.class);
     // 一定件数毎にコミットする閾値
-    private static final int COMMIT_THRESHOLD = 1000;
+    private static final int COMMIT_THRESHOLD = Integer.parseInt(Utility.getProp("commit.threshold"));
 
     public static void main(String[] args) {
         List<UserDto> newUserList = new ArrayList<UserDto>();
@@ -43,7 +44,7 @@ public class createUserMultiMain {
 
         try {
             // スレッドプールの作成（10スレッド）
-            ExecutorService executorService = Executors.newFixedThreadPool(2);
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
 
             UserDao dao = new UserDao();
 
@@ -70,6 +71,8 @@ public class createUserMultiMain {
                     } catch (Exception e) {
                         logger.error(GawainMessageConstants.APPLICATION_ERROR_MESSAGE_001, e);
                         DatabaseManager.rollback();
+                    } finally {
+                        DatabaseManager.commit();
                     }
                 });
             }
@@ -82,9 +85,6 @@ public class createUserMultiMain {
                 // タイムアウトした場合、スレッドプールを強制終了
                 executorService.shutdownNow();
             }
-
-            // 最後に残っている未コミットのトランザクションをコミットする
-            DatabaseManager.commit();
         } catch (Exception e) {
             logger.error(GawainMessageConstants.APPLICATION_ERROR_MESSAGE_001, e);
         } finally {
