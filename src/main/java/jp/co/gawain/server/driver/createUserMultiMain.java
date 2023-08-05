@@ -16,12 +16,10 @@ import jp.co.gawain.server.dto.UserDto;
 import jp.co.gawain.server.util.DatabaseManager;
 import jp.co.gawain.server.util.Utility;
 
-/**
- * バグあり
- * 想定件数作成されない
- */
 public class createUserMultiMain {
     private static Logger logger = LoggerFactory.getLogger(createUserMultiMain.class);
+    // スレッドプールのサイズ
+    private static final int THREAD_POOL_SIZE = Integer.parseInt(Utility.getProp("connection.pool.size="));
     // 一定件数毎にコミットする閾値
     private static final int COMMIT_THRESHOLD = Integer.parseInt(Utility.getProp("commit.threshold"));
 
@@ -44,7 +42,7 @@ public class createUserMultiMain {
 
         try {
             // スレッドプールの作成（10スレッド）
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
+            ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
             UserDao dao = new UserDao();
 
