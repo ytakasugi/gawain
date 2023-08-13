@@ -7,6 +7,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+//import org.apache.commons.csv.CSVFormat;
+//import org.apache.commons.csv.CSVParser;
+//import org.apache.commons.csv.CSVRecord;
+
 public class Utility {
     private static final String COMMON_PROP_PATH = "./application.properties";
     private static final String SQL_PROP_PATH = "./sql.properties";
@@ -46,7 +50,7 @@ public class Utility {
             e.printStackTrace();
         }
         return prop.getProperty(key);
-    }
+    } 
 
     /**
      * ユーザー情報を標準出力する

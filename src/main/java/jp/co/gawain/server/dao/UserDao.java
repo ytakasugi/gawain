@@ -44,4 +44,22 @@ public class UserDao {
         }
         return resultList;
     }
+
+    // 特定のユーザーを取得するメソッド
+    public List<Map<String, Object>> findByUserId(UserDto dto) throws Exception {
+        // 結果格納用配列の作成
+        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        // SQL文作成
+        String sql = Utility.getSql("findUserByUserId");
+        // パラメータリスト
+        List<Object> paramList = new ArrayList<Object>();
+        
+        try {
+            paramList.add(dto.getUserId());
+            resultList = DatabaseUtility.executeQuery(sql, paramList);
+        } catch (Exception e) {
+            logger.error(GawainMessageConstants.DATABASE_ERROR_MESSAGE_000, e);
+        }
+        return resultList;
+    }
 }

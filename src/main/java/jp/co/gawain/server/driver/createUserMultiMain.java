@@ -19,7 +19,7 @@ import jp.co.gawain.server.util.Utility;
 public class createUserMultiMain {
     private static Logger logger = LoggerFactory.getLogger(createUserMultiMain.class);
     // スレッドプールのサイズ
-    private static final int THREAD_POOL_SIZE = Integer.parseInt(Utility.getProp("connection.pool.size="));
+    private static final int THREAD_POOL_SIZE = Integer.parseInt(Utility.getProp("connection.pool.size"));
     // 一定件数毎にコミットする閾値
     private static final int COMMIT_THRESHOLD = Integer.parseInt(Utility.getProp("commit.threshold"));
 
