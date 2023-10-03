@@ -2,18 +2,12 @@ package jp.co.gawain.server.util;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-//import org.apache.commons.csv.CSVFormat;
-//import org.apache.commons.csv.CSVParser;
-//import org.apache.commons.csv.CSVRecord;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class Utility {
-    private static final String COMMON_PROP_PATH = "./application.properties";
-    private static final String SQL_PROP_PATH = "./sql.properties";
+    private static final String COMMON_PROP_NAME = "application";
+    private static final String SQL_PROP_NAME = "sql";
 
     /**
      * コンストラクタ
@@ -26,14 +20,8 @@ public class Utility {
      * @return String
      */
     public static String getProp(String key) {
-        Properties prop = new Properties();
-        try {
-            InputStream is = new FileInputStream(COMMON_PROP_PATH);
-            prop.load(is);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-        return prop.getProperty(key);
+        ResourceBundle rb = ResourceBundle.getBundle(COMMON_PROP_NAME, Locale.US);
+        return rb.getString(key);
     }
 
     /**
@@ -42,14 +30,8 @@ public class Utility {
      * @return String
      */
     public static String getSql(String key) {
-        Properties prop = new Properties();
-        try {
-            InputStream is = new FileInputStream(SQL_PROP_PATH);
-            prop.load(is);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-        return prop.getProperty(key);
+        ResourceBundle rb = ResourceBundle.getBundle(SQL_PROP_NAME, Locale.US);
+        return rb.getString(key);
     } 
 
     /**
